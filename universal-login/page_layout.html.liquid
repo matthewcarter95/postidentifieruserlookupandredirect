@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {%- auth0:head -%}
+    {% assign CDN_URL = "https://a0-acul-testing.s3.us-east-2.amazonaws.com" %}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+        line-height: 1.5;
+        font-weight: 400;
+
+        color-scheme: light;
+        color: rgba(0, 0, 0, 0.87);
+        background-color: #ffffff;
+
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+
+        --prompt-width: 512px;
+        --auth-background-url: url({{ CDN_URL | append: "/auth-background.jpg" }});
+
+      }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        min-height: 100vh;
+        background-size: cover;
+        background-position: 0 0;
+        background-repeat: no-repeat;
+        background-image: var(--auth-background-url);
+        background-attachment: fixed;
+      }
+
+      #root {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        margin: 0 auto;
+      }
+
+      #widget-container>main._widget {
+        align-items: flex-start;
+        justify-items: flex-start;
+        padding: 0;
+        margin: 4rem 0;
+        width: --prompt-width;
+        height: 100%;
+        min-height: 100%
+      }
+    </style>
+  </head>
+
+  <body class="_widget-auto-layout">
+    <div id="root">
+      <div id="widget-container" class="flex-1 w-full mx-auto max-w-7xl">
+        {%- auth0:widget -%}
+      </div>
+      {% comment %} Temporary Footer - Feel free to delete {% endcomment %}
+      <footer class="py-2 text-center text-white/60 bg-sky-950/60">
+        <span class="inline-block pr-1 text-sm font-semibold">
+          © 2025 MyApp Inc. All Rights Reserved
+        </span>
+        |
+        <span class="inline-block pr-1 text-sm font-semibold">
+          Photo by&nbsp;
+          <a class="underline"
+            href="https://unsplash.com/@adigold1?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Adi
+            Goldstein</a>
+          &nbsp;on&nbsp;
+          <a class="underline"
+            href="https://unsplash.com/photos/teal-led-panel-EUsVwEOsblE?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
+        </span>
+      </footer>
+    </div>
+  </body>
+</html>

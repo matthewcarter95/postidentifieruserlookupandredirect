@@ -1,0 +1,24 @@
+{
+  "rendering_mode": "advanced",
+  "context_configuration": [
+    "screen.texts",
+    "untrusted_data.submitted_form_data"
+  ],
+  "default_head_tags_disabled": false,
+  "head_tags": [
+    {
+      "tag": "script",
+      "attributes": {
+        "src": "http://localhost:3000/bundle.js",
+        "defer": true
+      }
+    },
+    {
+      "tag": "link",
+      "attributes": {
+        "rel": "stylesheet",
+        "href": "http://localhost:3000/style.css"
+      }
+    }
+  ]
+}

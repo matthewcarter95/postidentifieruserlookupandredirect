@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/images/auth0-icon-onlight.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SKO26 ACUL Lab</title>
+  </head>
+  <body>
+    <script>
+      /**
+       * This stub context object is only for previewing screens before connecting to an
+       * Auth0 tenant. You can edit this object to locally load different configurations.
+       * @link see https://auth0.com/docs/customize/login-pages/advanced-customizations/getting-started/context-data
+       * NOTE: This file is never used when connected to an Auth0 tenant.
+       */
+      window.universal_login_context = {
+        client: {
+          id: "abcde12345",
+          name: "local-client-stub",
+        },
+        prompt: {
+          name: "login-id",
+        },
+        screen: {
+          name: "login-id",
+          links: {
+            signup: "/u/sigup_link",
+            reset_password: "/u//reset-password_link"
+          },
+          data: {
+            username: "stub_username",
+            email: "stub@email.com"
+          },
+        },
+        transaction: {
+          state: "state-abcde12345",
+          locale: "us",
+          errors: [
+            {code: "some_code1", message:"FieldError!", field: "username"},
+            {code: "some_code2", message:"ScreenError!"},
+            {code: "some_code3", message:"ScreenError2!"}
+          ],
+          connection: {
+            name: "Username-Password-Authentication",
+            strategy: "auth0",
+            options: {
+              signup_enabled: true,
+              username_required: false,
+              forgot_password_enabled: true,
+              authentication_methods: {
+                password: {
+                  enabled: true,
+                  policy: "good"
+                },
+                passkey: {
+                  enabled: false
+                }
+              }
+            }
+          },
+          alternate_connections: [
+            { name: "google-oauth2", strategy: "google" }
+          ]
+        }
+      };
+    </script>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

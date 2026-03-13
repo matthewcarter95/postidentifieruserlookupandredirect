@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build artifacts
+*.zip
+function.zip
+
+# Test files
+response.json
+test-event.json
+
+# Environment variables (if used locally)
+.env
+.env.local
+
+# AWS SAM
+.aws-sam/

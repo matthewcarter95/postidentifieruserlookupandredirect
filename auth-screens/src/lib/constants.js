@@ -4,3 +4,6 @@ export const BASE_URL = "";
 
 // App Homepage URL
 export const APP_URL = "#";
+
+// Lambda Function URL for user lookup
+export const USER_LOOKUP_URL = import.meta.env.VITE_USER_LOOKUP_URL || "";

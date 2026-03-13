@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { cn, getFieldErrors } from "@/lib/utils";
 import { LoginId as ScreenProvider } from "@auth0/auth0-acul-js";
+import { lookupUserConnection } from "@/lib/api";
 
 // UI Components
 import { FieldError } from "@/components/ui/field-error";
@@ -19,6 +21,7 @@ import {
 export default function LoginId() {
   // Initialize the SDK for this screen
   const screenProvider = new ScreenProvider();
+  const [isLoading, setIsLoading] = useState(false);
 
   // Check if alternateConnections is available and has at least one item
   // if (!screenProvider.transaction.alternateConnections) {
@@ -34,18 +37,45 @@ export default function LoginId() {
   const identifierErrors = getFieldErrors("username", errors) || getFieldErrors("stub_username", errors);
 
   // Handle the submit action
-  const formSubmitHandler = (event) => {
+  const formSubmitHandler = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
 
     // disable the submit button
     const submitBtn = event.target.querySelector("button#submit-btn");
-    if (submitBtn) submitBtn.setAttribute("disabled", "false");
+    if (submitBtn) submitBtn.setAttribute("disabled", "true");
 
     // grab the values from the form
     const identifierInput = event.target.querySelector("input#identifier");
+    const identifier = identifierInput?.value;
 
-    // Call the SDK with challenge for identifier-first flow
-    screenProvider.challenge({ username: identifierInput?.value });
+    try {
+      // Step 1: Lookup user connection
+      const result = await lookupUserConnection(identifier);
+
+      if (result.found && result.connection) {
+        // Step 2: Re-initiate authorize with connection parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('connection', result.connection);
+        urlParams.set('login_hint', identifier); // Auto-populate identifier
+
+        // Get the Auth0 domain from the current URL
+        const auth0Domain = window.location.hostname;
+
+        // Redirect to /authorize with connection param
+        window.location.href = `${window.location.protocol}//${auth0Domain}/authorize?${urlParams.toString()}`;
+      } else {
+        // User not found - proceed with normal flow
+        screenProvider.challenge({ username: identifier });
+      }
+    } catch (error) {
+      console.error('User lookup error:', error);
+      // Fallback to normal flow on error
+      screenProvider.challenge({ username: identifier });
+    } finally {
+      setIsLoading(false);
+      if (submitBtn) submitBtn.removeAttribute("disabled");
+    }
   };
 
   // Render the form
@@ -84,8 +114,8 @@ export default function LoginId() {
             <FieldError key={index} error={error} />
           ))}
         </div>
-        <Button type="submit" id="submit-btn" className="w-full mt-4">
-          {screenProvider.screen.texts?.buttonText ?? "Continue"}
+        <Button type="submit" id="submit-btn" className="w-full mt-4" disabled={isLoading}>
+          {isLoading ? "Looking up..." : (screenProvider.screen.texts?.buttonText ?? "Continue")}
         </Button>
         <Text className="mb-2">
           {screenProvider.screen.texts?.footerText ??

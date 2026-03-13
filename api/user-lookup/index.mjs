@@ -1,9 +1,12 @@
 import axios from 'axios';
 
 export const handler = async (event) => {
+  // Get origin from request headers for CORS
+  const origin = event.headers?.origin || event.headers?.Origin || '*';
+
   // Handle CORS preflight
   if (event.requestContext.http.method === 'OPTIONS') {
-    return corsResponse(200, { message: 'OK' });
+    return corsResponse(200, { message: 'OK' }, origin);
   }
 
   try {
@@ -13,7 +16,7 @@ export const handler = async (event) => {
 
     // Validate input
     if (!identifier) {
-      return corsResponse(400, { error: 'Identifier required' });
+      return corsResponse(400, { error: 'Identifier required' }, origin);
     }
 
     // Sanitize identifier to prevent injection
@@ -35,15 +38,15 @@ export const handler = async (event) => {
         found: true,
         connection,
         userId
-      });
+      }, origin);
     }
 
     // User not found
-    return corsResponse(200, { found: false });
+    return corsResponse(200, { found: false }, origin);
 
   } catch (error) {
     console.error('Error:', error);
-    return corsResponse(500, { error: 'Internal server error' });
+    return corsResponse(500, { error: 'Internal server error' }, origin);
   }
 };
 
@@ -76,11 +79,11 @@ async function searchUsers(token, query) {
   return response.data;
 }
 
-function corsResponse(statusCode, body) {
+function corsResponse(statusCode, body, origin = '*') {
   return {
     statusCode,
     headers: {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': origin,
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
       'Content-Type': 'application/json'

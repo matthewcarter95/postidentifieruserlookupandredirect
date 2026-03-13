@@ -2,6 +2,7 @@ import { useState } from "react";
 import { cn, getFieldErrors } from "@/lib/utils";
 import { LoginId as ScreenProvider } from "@auth0/auth0-acul-js";
 import { lookupUserConnection } from "@/lib/api";
+import { OAUTH_CONFIG } from "@/lib/constants";
 
 // UI Components
 import { FieldError } from "@/components/ui/field-error";
@@ -54,16 +55,27 @@ export default function LoginId() {
       const result = await lookupUserConnection(identifier);
 
       if (result.found && result.connection) {
-        // Step 2: Re-initiate authorize with connection parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.set('connection', result.connection);
-        urlParams.set('login_hint', identifier); // Auto-populate identifier
-
-        // Get the Auth0 domain from the current URL
+        // Step 2: Redirect to /authorize with the detected connection
         const auth0Domain = window.location.hostname;
+        const authorizeUrl = new URL(`${window.location.protocol}//${auth0Domain}/authorize`);
 
-        // Redirect to /authorize with connection param
-        window.location.href = `${window.location.protocol}//${auth0Domain}/authorize?${urlParams.toString()}`;
+        // OAuth parameters from config
+        authorizeUrl.searchParams.set('client_id', OAUTH_CONFIG.CLIENT_ID);
+        authorizeUrl.searchParams.set('redirect_uri', OAUTH_CONFIG.REDIRECT_URI);
+        authorizeUrl.searchParams.set('scope', OAUTH_CONFIG.SCOPE);
+        authorizeUrl.searchParams.set('response_type', OAUTH_CONFIG.RESPONSE_TYPE);
+
+        // Add detected connection
+        authorizeUrl.searchParams.set('connection', result.connection);
+
+        // Add login_hint to pre-populate identifier
+        authorizeUrl.searchParams.set('login_hint', identifier);
+
+        console.log('Redirecting to connection:', result.connection);
+        console.log('Authorize URL:', authorizeUrl.toString());
+
+        // Redirect to /authorize with connection parameter
+        window.location.href = authorizeUrl.toString();
       } else {
         // User not found - proceed with normal flow
         screenProvider.challenge({ username: identifier });

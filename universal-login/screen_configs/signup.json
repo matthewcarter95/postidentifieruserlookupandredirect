@@ -9,7 +9,7 @@
     {
       "tag": "script",
       "attributes": {
-        "src": "http://localhost:3000/bundle.js",
+        "src": "http://localhost:3008/bundle.js",
         "defer": true
       }
     },
@@ -17,7 +17,7 @@
       "tag": "link",
       "attributes": {
         "rel": "stylesheet",
-        "href": "http://localhost:3000/style.css"
+        "href": "http://localhost:3008/style.css"
       }
     }
   ]

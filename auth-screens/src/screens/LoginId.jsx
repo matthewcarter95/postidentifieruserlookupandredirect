@@ -77,16 +77,28 @@ export default function LoginId() {
         // Redirect to /authorize with connection parameter
         window.location.href = authorizeUrl.toString();
       } else {
-        // User not found - proceed with normal flow
-        screenProvider.challenge({ username: identifier });
+        // User not found - submit the form naturally to continue with Auth0's flow
+        console.log('User not found, continuing with normal ACUL flow');
+
+        // Re-enable button and clear loading state
+        setIsLoading(false);
+        if (submitBtn) submitBtn.removeAttribute("disabled");
+
+        // Submit the form to Auth0 (removes event.preventDefault effect)
+        event.target.submit();
       }
     } catch (error) {
       console.error('User lookup error:', error);
-      // Fallback to normal flow on error
-      screenProvider.challenge({ username: identifier });
-    } finally {
+
+      // Fallback: submit the form naturally to continue with Auth0's flow
+      console.log('Error during lookup, falling back to normal ACUL flow');
+
+      // Re-enable button and clear loading state
       setIsLoading(false);
       if (submitBtn) submitBtn.removeAttribute("disabled");
+
+      // Submit the form to Auth0
+      event.target.submit();
     }
   };
 

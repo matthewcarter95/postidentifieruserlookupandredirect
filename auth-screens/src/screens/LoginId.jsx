@@ -54,51 +54,53 @@ export default function LoginId() {
       // Step 1: Lookup user connection
       const result = await lookupUserConnection(identifier);
 
+      // Build authorize URL with OAuth parameters
+      const auth0Domain = window.location.hostname;
+      const authorizeUrl = new URL(`${window.location.protocol}//${auth0Domain}/authorize`);
+
+      // OAuth parameters from config
+      authorizeUrl.searchParams.set('client_id', OAUTH_CONFIG.CLIENT_ID);
+      authorizeUrl.searchParams.set('redirect_uri', OAUTH_CONFIG.REDIRECT_URI);
+      authorizeUrl.searchParams.set('scope', OAUTH_CONFIG.SCOPE);
+      authorizeUrl.searchParams.set('response_type', OAUTH_CONFIG.RESPONSE_TYPE);
+
+      // Add login_hint to pre-populate identifier
+      authorizeUrl.searchParams.set('login_hint', identifier);
+
       if (result.found && result.connection) {
-        // Step 2: Redirect to /authorize with the detected connection
-        const auth0Domain = window.location.hostname;
-        const authorizeUrl = new URL(`${window.location.protocol}//${auth0Domain}/authorize`);
-
-        // OAuth parameters from config
-        authorizeUrl.searchParams.set('client_id', OAUTH_CONFIG.CLIENT_ID);
-        authorizeUrl.searchParams.set('redirect_uri', OAUTH_CONFIG.REDIRECT_URI);
-        authorizeUrl.searchParams.set('scope', OAUTH_CONFIG.SCOPE);
-        authorizeUrl.searchParams.set('response_type', OAUTH_CONFIG.RESPONSE_TYPE);
-
-        // Add detected connection
+        // User found - add detected connection
         authorizeUrl.searchParams.set('connection', result.connection);
-
-        // Add login_hint to pre-populate identifier
-        authorizeUrl.searchParams.set('login_hint', identifier);
-
-        console.log('Redirecting to connection:', result.connection);
-        console.log('Authorize URL:', authorizeUrl.toString());
-
-        // Redirect to /authorize with connection parameter
-        window.location.href = authorizeUrl.toString();
+        console.log('User found - Redirecting to connection:', result.connection);
       } else {
-        // User not found - submit the form naturally to continue with Auth0's flow
-        console.log('User not found, continuing with normal ACUL flow');
-
-        // Re-enable button and clear loading state
-        setIsLoading(false);
-        if (submitBtn) submitBtn.removeAttribute("disabled");
-
-        // Submit the form to Auth0 (removes event.preventDefault effect)
-        event.target.submit();
+        // User not found - redirect without connection parameter
+        // Auth0 will show default Universal Login
+        console.log('User not found - Redirecting to default Universal Login');
       }
+
+      console.log('Authorize URL:', authorizeUrl.toString());
+
+      // Redirect to /authorize
+      window.location.href = authorizeUrl.toString();
     } catch (error) {
       console.error('User lookup error:', error);
 
-      // Fallback: submit the form naturally to continue with Auth0's flow
-      console.log('Error during lookup, falling back to normal ACUL flow');
+      // Fallback: redirect to /authorize without connection
+      console.log('Error during lookup, falling back to default Universal Login');
 
-      // Re-enable button and clear loading state
-      setIsLoading(false);
-      if (submitBtn) submitBtn.removeAttribute("disabled");
+      const auth0Domain = window.location.hostname;
+      const authorizeUrl = new URL(`${window.location.protocol}//${auth0Domain}/authorize`);
 
-      // Submit the form to Auth0
-      event.target.submit();
+      // OAuth parameters from config
+      authorizeUrl.searchParams.set('client_id', OAUTH_CONFIG.CLIENT_ID);
+      authorizeUrl.searchParams.set('redirect_uri', OAUTH_CONFIG.REDIRECT_URI);
+      authorizeUrl.searchParams.set('scope', OAUTH_CONFIG.SCOPE);
+      authorizeUrl.searchParams.set('response_type', OAUTH_CONFIG.RESPONSE_TYPE);
+      authorizeUrl.searchParams.set('login_hint', identifier);
+
+      console.log('Fallback Authorize URL:', authorizeUrl.toString());
+
+      // Redirect to /authorize without connection parameter
+      window.location.href = authorizeUrl.toString();
     }
   };
 

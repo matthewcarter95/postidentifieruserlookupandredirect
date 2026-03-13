@@ -32,7 +32,6 @@ export default function LoginId() {
   // Grab the any errors, if any
   const errors = screenProvider.transaction.errors;
   const identifierErrors = getFieldErrors("username", errors) || getFieldErrors("stub_username", errors);
-  const passwordErrors = getFieldErrors("password", errors);
 
   // Handle the submit action
   const formSubmitHandler = (event) => {
@@ -44,10 +43,9 @@ export default function LoginId() {
 
     // grab the values from the form
     const identifierInput = event.target.querySelector("input#identifier");
-    const passwordInput = event.target.querySelector("input#password");
 
-    // Call the SDK
-    screenProvider.login({ username: identifierInput?.value, password: passwordInput?.value });
+    // Call the SDK with challenge for identifier-first flow
+    screenProvider.challenge({ username: identifierInput?.value });
   };
 
   // Render the form
@@ -86,22 +84,7 @@ export default function LoginId() {
             <FieldError key={index} error={error} />
           ))}
         </div>
-        <div className="mb-4 space-y-2">
-          <Label
-            htmlFor="password"
-            className={cn(
-              "block mb-2 font-semibold",
-              passwordErrors?.length ? "text-red-600" : "text-inherit"
-            )}
-          >
-            Password
-          </Label>
-          <Input type="password" id="password" name="password" />
-          {passwordErrors?.map((error, index) => (
-            <FieldError key={index} error={error} />
-          ))}
-        </div>
-        <Button type="submit" id="submit-btn" className="w-full">
+        <Button type="submit" id="submit-btn" className="w-full mt-4">
           {screenProvider.screen.texts?.buttonText ?? "Continue"}
         </Button>
         <Text className="mb-2">

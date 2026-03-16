@@ -109,11 +109,8 @@ export default function LoginId() {
     <form noValidate onSubmit={formSubmitHandler}>
       <CardHeader>
         <CardTitle className="mb-2 text-center" style={{fontSize: '24px'}}>
-          Log in to the Personal Investor site
+          Log in to your OpCo
         </CardTitle>
-        <CardDescription className="mb-8 text-center" style={{fontSize: '14px'}}>
-          Not a personal investor?
-        </CardDescription>
         <ScreenErrors className="mb-4" errors={errors} />
       </CardHeader>
       <CardContent>
